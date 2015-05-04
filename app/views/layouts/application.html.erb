@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html ng-app="sinav">
+<head>
+	<%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+  	<%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  	<%= csrf_meta_tags %>
+    <meta charset="utf-8">
+    <link rel="icon" href="../../favicon.ico">
+  
+    <title>Online Sınav</title>
+   
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script src="script.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.js"></script>
+    <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.12.1.js"></script>
+    <script type="text/javascript">
+        $(function() {
+          $(".example").TimeCircles({
+            "count_past_zero": false,
+            "animation": "smooth",
+            "bg_width": 0.2,
+            "fg_width": 0.02666666666666667,
+            "circle_bg_color": "#60686F",
+            "time": {
+              "Days": {"show": false},
+              "Hours": {"show": false},
+              "Minutes": {
+                "text": "Dakika",
+                "color": "#617fdb",
+                "show": true },
+              "Seconds": {
+                "text": "Saniye",
+                "color": "#df6d6d",
+                "show": true}}
+          });
+        });
+    </script>
+  </head>
+  
+<body class= "container">
+
+<%= yield %>
+
+</body>
+</html>

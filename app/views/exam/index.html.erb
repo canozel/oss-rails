@@ -1,0 +1,159 @@
+<div class="container" ng-controller="sinavapp", ng-show="<%= current_user %>" ng-init="user(<%=  current_user.answers.ids if !current_user.blank? %>)">
+  <nav class="navbar navbar-default ">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a id="s" class="navbar-brand" href="#">
+           <img ng-src="http://i.imgur.com/WNkXabA.png" width="250" height="30"></img>
+        </a>
+        <h3 class="navbar-text navbar-right">Bilgisayar Programcılığı  <small>Bilişim sistemleri online sınavı</small></h3>
+        <%= link_to "Çıkış Yap", destroy_user_session_path, method: :delete %>
+      </div>
+    </div>
+    
+  </nav>
+   <!--Soru içeriği  -->
+  <div class="row">
+      <div class="col-md-12 ">
+        <div class="panel panel-default">
+          <div class="panel-heading ">
+            Soru {{questions[currentTab].id + 1}}
+            <span class="glyphicon glyphicon-pencil"></span>
+            
+            <!--Tekrar Gözat-->
+            <input type="checkbox" ng-model="again[currentTab]" ng-change="repeat(questions[currentTab].id,again[currentTab])">Tekrar Gözat
+            
+            <!--Ayarlar Menüsü-->
+            <ul class="nav nav-pills">
+              <li class="dropdown">
+                <div class="btn-group">
+                  <button data-toggle="dropdown" class="btn dropdown-toggle"  data-placeholder="Please select"><span class="glyphicon glyphicon-cog"></span> Ayarlar <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                      <li><input type="checkbox" id="1" ng-model="oto" ng-change="oto"><label for="1" name="NAME" value="VALUE">Otomatik Geçiş</label></li> 
+                      <li><input type="checkbox" id="2" ng-model="clock" ng-change="clock"><label for="2" name="NAME" value="VALUE">Saati {{clock ? "Gizle" : "Göster"}}</label></li> 
+                      <li><input type="checkbox" id="3" ng-model="filter" ng-change="filter"><label for="3" name="NAME" value="VALUE">Filtreyi ve Etiketi {{filter ? "Gizle" : "Göster"}}</label></li>
+                      <li><input type="checkbox" id="4" ng-model="progress" ng-change="progress"><label for="4" name="NAME" value="VALUE">Bar {{progress ? "Gizle" : "Göster"}}</label></li>
+                    </ul>
+                </div>
+              </li>
+            </ul>
+          </div>
+          
+          <!--Soru ve Şıklar-->
+          <div id="s" class="panel-body">
+            <div class="tab-content">
+              <!--Soru-->
+              <img ng-if = "questions[currentTab].imageQuestion" ng-src="{{questions[currentTab].imageQuestion}}">
+              <mark>{{questions[currentTab].question}}</mark>
+              
+              <!--Şıklar-->
+              <div class="radio" ng-repeat="option in (questions[currentTab].options)">
+                <label>
+                  <input type="radio" name="option" ng-model="$parent.model" 
+                                                    ng-change="selected($parent.model.id,currentTab)"
+                                                    ng-init="$index==answers[currentTab]?($parent.model=option):''"
+                                                    ng-value="option" />
+                    <img ng-if = "questions[currentTab].imageQuestion" ng-src="{{option.name}}">
+                    {{questions[currentTab].imageQuestion ? '' : option.name}}
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <!--ileri - geri -->
+          <nav>
+            <ul class="pager">
+              <li><a class="btn" ng-disabled="currentTab == 0" ng-click="onClickPB(currentTab)">Önceki Soru </a></li>
+              <li><a class="btn" ng-disabled="currentTab == questions.length -1"  ng-click="onClickNB(currentTab, questions.length)">Sonraki Soru</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+  </div>
+    
+  <!--Soru tabları  -->
+  <div ng-hide = "!clock && !progress && !filter" id="s" class="row">
+    <div class="panel panel-default">
+      <div class="panel-heading">      
+        <strong>
+                  {{cevaplanmis == true && bos == true ? 'Tüm Sorular': ''}}
+                  {{cevaplanmis == true && bos == false ? 'Cevaplanmış Sorular': ''}}
+                  {{cevaplanmis == false && bos == true ? 'Boş Sorular': ''}}
+        </strong>
+      </div>
+      <div class="panel-body">
+        <div ng-show="filter" class="col-md-3 tab">
+          <button class="btn btn-primary" ng-click="cevaplanmis = true; bos = true; tekrar = false" type="button">
+            <div>Tüm Sorular <span class="badge">{{questions.length}}</span></div>
+          </button>
+          <button class="btn btn-success" ng-click="cevaplanmis = true; bos = false; tekrar = false" type="button">
+            Cevaplanmış Sorular <span class="badge">{{uniq()}}</span>
+          </button>
+          <button class="btn btn-warning" ng-click="bos = true; cevaplanmis = false; tekrar = false" type="button">
+            Boş Sorular         <span class="badge">{{questions.length - uniq()}}</span>
+          </button>
+          <button class="btn btn-info" ng-click="tekrar = true" type="button">
+            Tekrar Bakılacaklar <span class="badge">{{uniq(again) }}</span>
+          </button>
+        </div>
+        <div class="col-md-7">
+          
+          <div ng-show="filter" ng-init="currentTab = 0; class = false" ;>
+            <button  type="button"  ng-repeat="question in questions " 
+                                    ng-show= "show(question.id)"
+                                    ng-click="onClickTab(question)"
+                                    ng-class="{'btn ':true, 'active':(currentTab == question.id),
+                                               'btn-success':(answers[question.id] != null),
+                                               'btn-default':(answers[question.id] == null),
+                                               'btn-info':(again[question.id] != null) && again[question.id] == true}">
+              {{question.id + 1 < 10 ? "0"+(question.id+1)  : question.id + 1}}
+              <span ng-class="{' glyphicon glyphicon-pencil':(currentTab == question.id)}" ></span>
+              <span ng-class="{'glyphicon glyphicon-ok-circle':(answers[question.id] != null) && (currentTab != question.id)}" ></span>
+              <span ng-class="{'glyphicon glyphicon-ban-circle':(answers[question.id]== null) && (currentTab != question.id)}"></span>
+            </button>
+          </div>
+          <br>
+          <div ng-show="progress" class="progress">
+              <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: {{(100/questions.length)*uniq()}}%">
+                <p class="text-danger">%{{(100/questions.length)*uniq()}}</p>
+              </div>
+            </div>
+        </div>
+        <div ng-show="clock" class="col-md-2">
+          <div class="sinav">
+            <div class="example" data-timer="{{counter}}"></div>
+            <hr>
+            <!--modal-->
+            <script type="text/ng-template" id="myModalContent.html">
+                <div class="modal-header">
+                    <h2 ng-show="{{accept && (correct < 1)}}" class="modal-title">Sınav süreniz doldu</h2>
+                </div>
+                <div class="modal-body">
+                    <h4 ng-hide="accept">{{(questions.length - uniq) == 0 ? 'Sınavı bitirmek istediğinize emin misiniz?' :  questions.length - answered + ' adet cevaplanmamış sorunuz var. Yinede sınavı bitirmek istiyor musunuz?'}} </h4>
+                    <div ng-show="accept">
+                      <h4>Doğru Sayısı : {{correct}}</h4>
+                      <h4>Yanlış Sayısı : {{uniq - correct }}</h4>
+                      <h4>Boş Sayısı : {{questions.length - uniq}}</h4>
+                      <hr>
+                      <h4>Sonuç/Puan : {{(100/questions.length)*correct}} </h4>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button ng-hide="accept"class="btn btn-primary" ng-click="ok()">Kabul Et</button>
+                    <button ng-hide="accept" class="btn btn-warning" ng-click="cancel()">İptal</button>
+                    <button ng-show="accept" class="btn btn-warning" ng-click="cancel()">Sınavı Tekrarla</button>
+                </div>
+              </script> <!--modal-->                 
+            <button type="button" class="btn btn-danger" ng-click="end('lg')"><span class="glyphicon glyphicon-ok"></span> Sınavı Bitir</button>
+          </div>
+      </div>
+      <!--Sınav sonlandır  -->
+      </div>
+    </div>
+  </div>
+</div><!-- /container -->
+
+<div class="container" ng-show="<%= !current_user %>">
+  <h2>Giriş Yapılmadı..</h2>
+  <%= link_to "Giriş Yap", new_user_session_path %>
+</div>
