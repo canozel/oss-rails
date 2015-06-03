@@ -1,12 +1,23 @@
 // Code goes here
 
 // Code goes here
-angular.module('sinav', ['ui.bootstrap']);
-angular.module('sinav').controller('sinavapp', function($scope, $http, $modal, $log, $timeout) {
+var app = angular.module('sinav', ['ui.bootstrap','ngResource']);
 
-  $scope.user = function(current_user) {
-    $scope.answers = current_user; 
-  }
+app.factory('Answer', ['$resource', function($resource){
+  return  $resource("/answers/:id", {id: "@id"}, {
+    'save'   : {method:'POST'},
+    'query'  : {method: 'GET'}
+  });
+}]);
+
+app.controller('sinavapp',['$scope',  '$modal', '$log', '$timeout', 'Answer', function($scope, $modal, $log, $timeout, Answer) {
+  $scope.answers = [];  
+  
+  $scope.a = Answer.query(function(res) {
+    for(i = 0; i < res.answers.length; i++){
+      $scope.answers.push(res.answers[i].answers.exam_answer);
+    }
+  }); 
   $scope.questions = [
     {
         "id": 0,
@@ -227,10 +238,11 @@ angular.module('sinav').controller('sinavapp', function($scope, $http, $modal, $
       }
     });
   }
-});
+
+}]);
 
 //modal
-angular.module('sinav').controller('ModalInstanceCtrl', function ($scope, $modalInstance, $window,accept, answers, questions, uniq) {
+app.controller('ModalInstanceCtrl', function ($scope, $modalInstance, $window,accept, answers, questions, uniq) {
   $scope.accept = accept;
   $scope.answers = answers;
   $scope.questions = questions;
@@ -269,10 +281,3 @@ angular.module('sinav').controller('ModalInstanceCtrl', function ($scope, $modal
   };
 });
 
-angular.module('sinav').factory('User', ['$resource', function($resource){
- return $resource('/users/:id.json', {}, {
- show: { method: 'GET' },
- update: { method: 'PUT', params: {id: '@id'} },
- delete: { method: 'DELETE', params: {id: '@id'} }
- });
-}]);

@@ -15,7 +15,8 @@ ActiveRecord::Schema.define(version: 20150504111927) do
 
   create_table "answers", force: true do |t|
     t.integer  "user_id"
-    t.string   "list",       default: "--- []\n"
+    t.integer  "exam_no"
+    t.integer  "exam_answer"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

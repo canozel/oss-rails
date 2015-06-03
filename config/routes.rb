@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   devise_for :users
+  resources :answers, defaults: {format: :json}
   devise_scope :user do
     get 'register', to: 'devise/registrations#new', as: :register
     get 'login', to: 'devise/sessions#new', as: :login
@@ -11,7 +12,7 @@ Rails.application.routes.draw do
   # See how all your routes lay out with "rake routes".
 
   # You can have the root of your site routed with "root"
-  root 'exam#index'
+  root 'exams#index'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
