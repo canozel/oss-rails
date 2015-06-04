@@ -5,7 +5,7 @@ class AnswersController < ApplicationController
 		respond_with current_user.answers
 	end
 
-	def show
-		respond_with current_user.answers.find(params[:id])
+	def create
+		respond_with Answer.create(user_id: current_user.id, exam_no: params[:exam_no], exam_answer: params[:exam_answer])
 	end
 end

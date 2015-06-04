@@ -10,12 +10,12 @@ app.factory('Answer', ['$resource', function($resource){
   });
 }]);
 
-app.controller('sinavapp',['$scope',  '$modal', '$log', '$timeout', 'Answer', function($scope, $modal, $log, $timeout, Answer) {
+app.controller('sinavapp',['$scope',  '$modal', '$log', '$timeout', 'Answer',  function($scope, $modal, $log, $timeout, Answer) {
   $scope.answers = [];  
   
-  $scope.a = Answer.query(function(res) {
+  Answer.query(function(res) {
     for(i = 0; i < res.answers.length; i++){
-      $scope.answers.push(res.answers[i].answers.exam_answer);
+      $scope.answers[res.answers[i].answers.exam_no - 1] = res.answers[i].answers.exam_answer;
     }
   }); 
   $scope.questions = [
@@ -197,6 +197,7 @@ app.controller('sinavapp',['$scope',  '$modal', '$log', '$timeout', 'Answer', fu
   }
   //İşaretlenen Soruları Tutma
   $scope.selected = function(ans,currentTab){
+    Answer.save({exam_no: currentTab+1, exam_answer: ans});
     $scope.answers[currentTab] = ans-1;
     if ($scope.oto && currentTab <19){
       $scope.currentTab = currentTab + 1;
